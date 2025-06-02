@@ -1,0 +1,77 @@
+  <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Sistema de Votos</title>
+        <style>
+            body { font-family: Arial; margin: 20px; }
+            .option { 
+                padding: 10px; 
+                margin: 5px; 
+                border: 1px solid #ddd; 
+                cursor: pointer;
+            }
+            .option:hover { background-color: #f5f5f5; }
+            .results {
+                margin-top: 20px;
+                padding: 10px;
+                background-color: #f9f9f9;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Sistema de Votação</h1>
+        <div id="options">
+            <div class="option" onclick="vote('1')">Sporting</div>
+            <div class="option" onclick="vote('2')">Benfica</div>
+            <div class="option" onclick="vote('3')">Porto</div>
+        </div>
+        <button onclick="showResults()">Ver Resultados</button>
+        <div id="results" class="results" style="display:none;"></div>
+        
+        <script>
+            function vote(option) {
+         
+                fetch('/api/vote', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ option: option })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('Voto registado com sucesso!');
+                        showResults();
+                    } else {
+                        alert('Erro ao registar voto: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Erro ao comunicar com o servidor');
+                });
+            }
+            
+            function showResults() {
+                const resultsDiv = document.getElementById('results');
+                resultsDiv.style.display = 'block';
+                resultsDiv.innerHTML = 'Resultados...';
+                
+                fetch('/api/results')
+                .then(response => response.json())
+                .then(data => {
+                    let html = '<h2>Resultados</h2>';
+                    for (const [option, count] of Object.entries(data)) {
+                        html += `<p>Opção ${option}: ${count} votos</p>`;
+                    }
+                    resultsDiv.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    resultsDiv.innerHTML = 'Erro ao carregar resultados';
+                });
+            }
+        </script>
+    </body>
+    </html>

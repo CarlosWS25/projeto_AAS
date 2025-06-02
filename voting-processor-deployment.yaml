@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: voting-processor
+  name: voting-processor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: voting-processor
+  template:
+    metadata:
+      labels:
+        app: voting-processor
+    spec:
+      containers:
+      - image: vote-processor:v1
+        name: vote-processor
+        ports:
+        - containerPort: 5000
+        env:
+        - name: FLASK_ENV
+          value: "production"
