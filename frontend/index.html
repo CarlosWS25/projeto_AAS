@@ -1,77 +1,476 @@
-  <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Sistema de Votos</title>
-        <style>
-            body { font-family: Arial; margin: 20px; }
-            .option { 
-                padding: 10px; 
-                margin: 5px; 
-                border: 1px solid #ddd; 
-                cursor: pointer;
-            }
-            .option:hover { background-color: #f5f5f5; }
-            .results {
-                margin-top: 20px;
-                padding: 10px;
-                background-color: #f9f9f9;
-            }
-        </style>
-    </head>
-    <body>
-        <h1>Sistema de Votação</h1>
-        <div id="options">
-            <div class="option" onclick="vote('1')">Sporting</div>
-            <div class="option" onclick="vote('2')">Benfica</div>
-            <div class="option" onclick="vote('3')">Porto</div>
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UALFlix - Sistema de Streaming Distribuído</title>
+    <meta name="description" content="UALFlix - Mini sistema de streaming distribuído" />
+    
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #3b82f6 100%);
+        color: white;
+        line-height: 1.6;
+        min-height: 100vh;
+      }
+      
+      .header {
+        background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #60a5fa;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      
+      .logo {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #fbbf24;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+      
+      .nav {
+        display: flex;
+        gap: 2rem;
+      }
+      
+      .nav a {
+        color: white;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        transition: all 0.3s;
+        background: rgba(255, 255, 255, 0.1);
+      }
+      
+      .nav a:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+      }
+      
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+      
+      .section {
+        margin-bottom: 3rem;
+      }
+      
+      .section h2 {
+        margin-bottom: 1rem;
+        color: #fbbf24;
+        border-bottom: 2px solid #60a5fa;
+        padding-bottom: 0.5rem;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+      }
+      
+      .video-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1rem;
+      }
+      
+      .video-card {
+        background: linear-gradient(145deg, #3b82f6, #2563eb);
+        border-radius: 12px;
+        padding: 1rem;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      
+      .video-card:hover {
+        transform: scale(1.05) translateY(-5px);
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
+      }
+      
+      .video-thumbnail {
+        width: 100%;
+        height: 180px;
+        background: linear-gradient(135deg, #1e40af, #3730a3);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        color: #e0e7ff;
+        font-size: 1.2rem;
+      }
+      
+      .video-title {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+        color: #f1f5f9;
+      }
+      
+      .video-info {
+        color: #cbd5e1;
+        font-size: 0.9rem;
+      }
+      
+      .stream-controls {
+        background: linear-gradient(145deg, #2563eb, #1d4ed8);
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      
+      .control-group {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        align-items: center;
+      }
+      
+      .control-group label {
+        min-width: 120px;
+        color: #e0e7ff;
+      }
+      
+      .control-group input, .control-group select {
+        padding: 0.5rem;
+        border: 1px solid #60a5fa;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        flex: 1;
+        backdrop-filter: blur(10px);
+      }
+      
+      .control-group input::placeholder {
+        color: #cbd5e1;
+      }
+      
+      .btn {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        color: #1e40af;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: all 0.3s;
+        box-shadow: 0 4px 10px rgba(251, 191, 36, 0.3);
+      }
+      
+      .btn:hover {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(251, 191, 36, 0.5);
+      }
+      
+      .btn-secondary {
+        background: linear-gradient(135deg, #64748b, #475569);
+        color: white;
+      }
+      
+      .btn-secondary:hover {
+        background: linear-gradient(135deg, #475569, #334155);
+      }
+      
+      .status-panel {
+        background: linear-gradient(145deg, #2563eb, #1d4ed8);
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      
+      .status-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+      }
+      
+      .status-item {
+        background: linear-gradient(145deg, #3b82f6, #2563eb);
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      
+      .status-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #fbbf24;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+      }
+      
+      .footer {
+        background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
+        text-align: center;
+        padding: 2rem;
+        margin-top: 3rem;
+        border-top: 2px solid #60a5fa;
+        box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="header">
+      <div class="logo">UALFlix</div>
+    </header>
+
+    <div class="container">
+      <!-- Lista de Vídeos Disponíveis -->
+      
+
+      <!-- Upload de Vídeos -->
+      <section id="upload" class="section">
+        <h2>Upload de Vídeos</h2>
+        <div class="stream-controls">
+          <div class="control-group">
+            <label>Arquivo:</label>
+            <input type="file" accept="video/*" id="videoFile">
+          </div>
+          <div class="control-group">
+            <label>Título:</label>
+            <input type="text" placeholder="Título do vídeo" id="videoTitle">
+          </div>
+          <div class="control-group">
+            <label>Descrição:</label>
+            <input type="text" placeholder="Descrição do vídeo" id="videoDescription">
+          </div>
+          <div class="control-group">
+            <button class="btn" onclick="uploadVideo()">Fazer Upload</button>
+          </div>
         </div>
-        <button onclick="showResults()">Ver Resultados</button>
-        <div id="results" class="results" style="display:none;"></div>
-        
-        <script>
-            function vote(option) {
-         
-                fetch('/api/vote', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ option: option })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        alert('Voto registado com sucesso!');
-                        showResults();
-                    } else {
-                        alert('Erro ao registar voto: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro:', error);
-                    alert('Erro ao comunicar com o servidor');
-                });
-            }
-            
-            function showResults() {
-                const resultsDiv = document.getElementById('results');
-                resultsDiv.style.display = 'block';
-                resultsDiv.innerHTML = 'Resultados...';
-                
-                fetch('/api/results')
-                .then(response => response.json())
-                .then(data => {
-                    let html = '<h2>Resultados</h2>';
-                    for (const [option, count] of Object.entries(data)) {
-                        html += `<p>Opção ${option}: ${count} votos</p>`;
-                    }
-                    resultsDiv.innerHTML = html;
-                })
-                .catch(error => {
-                    console.error('Erro:', error);
-                    resultsDiv.innerHTML = 'Erro ao carregar resultados';
-                });
-            }
-        </script>
-    </body>
-    </html>
+      </section>
+      
+    </div>
+
+    
+<section class="section">
+  <h2>Vídeos Carregados</h2>
+  <div id="videoList" class="video-grid"></div>
+</section>
+
+<footer class="footer">
+      <p>&copy; 2024 UALFlix - Sistema de Streaming Distribuído</p>
+      <p>Projeto de Sistemas Distribuídos</p>
+    </footer>
+
+    
+
+
+
+
+
+
+
+
+  
+
+
+</body>
+
+
+
+<script>
+  function formatarDuracao(segundos) {
+    const minutos = Math.floor(segundos / 60);
+    const seg = Math.floor(segundos % 60).toString().padStart(2, '0');
+    return `${minutos}:${seg}`;
+  }
+
+  async function carregarVideos() {
+    const response = await fetch('http://localhost:30000/api/videos');
+    const data = await response.json();
+
+    const container = document.getElementById('videoList');
+    container.innerHTML = '';
+
+    data.videos.forEach(video => {
+      const div = document.createElement('div');
+      div.className = 'video-card';
+
+      const videoElementId = `video-${video._id}`;
+      div.innerHTML = `
+        <h3 class="video-title">${video.title}</h3>
+        <p class="video-info">${video.description}</p>
+        <video id="${videoElementId}" width="100%" height="240" preload="metadata" controls>
+          <source src="${video.file_path.replace('uploads', '/static')}" type="video/mp4">
+          O teu browser não suporta o vídeo.
+        </video>
+        <p class="video-info" id="duracao-${video._id}">Duração: ...</p>
+        <button class="btn btn-secondary" onclick="apagarVideo('${video._id}')">Apagar</button>
+      `;
+
+      container.appendChild(div);
+
+      const vid = div.querySelector(`#${videoElementId}`);
+      vid.onloadedmetadata = () => {
+        const duracao = formatarDuracao(vid.duration);
+        div.querySelector(`#duracao-${video._id}`).innerText = `Duração: ${duracao}`;
+      };
+    });
+  }
+
+  async function apagarVideo(id) {
+    if (!confirm("Tens a certeza que queres apagar este vídeo?")) return;
+
+    try {
+      const response = await fetch('http://localhost:30000/api/videos/' + id, {
+        method: 'DELETE'
+      });
+      const data = await response.json();
+      alert(data.message || 'Vídeo apagado');
+      carregarVideos();
+    } catch (err) {
+      alert("Erro ao apagar vídeo");
+      console.error(err);
+    }
+  }
+
+  async function uploadVideo() {
+    const file = document.getElementById('videoFile').files[0];
+    const title = document.getElementById('videoTitle').value;
+    const description = document.getElementById('videoDescription').value;
+
+    if (!file || !title || !description) {
+      alert('Todos os campos são obrigatórios.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('title', title);
+    formData.append('description', description);
+
+    try {
+      const response = await fetch('http://localhost:30000/api/videos', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await response.json();
+      alert(data.message || 'Vídeo adicionado.');
+      carregarVideos();
+    } catch (error) {
+      alert('Erro ao adicionar vídeo.');
+      console.error(error);
+    }
+  }
+
+  window.onload = carregarVideos;
+</script>
+
+
+
+</html>
+    
+
+
+</body>
+    
+
+
+<script>
+  function formatarDuracao(segundos) {
+    const minutos = Math.floor(segundos / 60);
+    const seg = Math.floor(segundos % 60).toString().padStart(2, '0');
+    return `${minutos}:${seg}`;
+  }
+
+  async function carregarVideos() {
+    const response = await fetch('http://localhost:30000/api/videos');
+    const data = await response.json();
+
+    const container = document.getElementById('videoList');
+    container.innerHTML = '';
+
+    data.videos.forEach(video => {
+      const div = document.createElement('div');
+      div.className = 'video-card';
+
+      const videoElementId = `video-${video._id}`;
+      div.innerHTML = `
+        <h3 class="video-title">${video.title}</h3>
+        <p class="video-info">${video.description}</p>
+        <video id="${videoElementId}" width="100%" height="240" preload="metadata" controls>
+          <source src="${video.file_path.replace('uploads', '/static')}" type="video/mp4">
+          O teu browser não suporta o vídeo.
+        </video>
+        <p class="video-info" id="duracao-${video._id}">Duração: ...</p>
+        <button class="btn btn-secondary" onclick="apagarVideo('${video._id}')">Apagar</button>
+      `;
+
+      container.appendChild(div);
+
+      const vid = div.querySelector(`#${videoElementId}`);
+      vid.onloadedmetadata = () => {
+        const duracao = formatarDuracao(vid.duration);
+        div.querySelector(`#duracao-${video._id}`).innerText = `Duração: ${duracao}`;
+      };
+    });
+  }
+
+  async function apagarVideo(id) {
+    if (!confirm("Tens a certeza que queres apagar este vídeo?")) return;
+
+    try {
+      const response = await fetch('http://localhost:30000/api/videos/' + id, {
+        method: 'DELETE'
+      });
+      const data = await response.json();
+      alert(data.message || 'Vídeo apagado');
+      carregarVideos();
+    } catch (err) {
+      alert("Erro ao apagar vídeo");
+      console.error(err);
+    }
+  }
+
+  async function uploadVideo() {
+    const file = document.getElementById('videoFile').files[0];
+    const title = document.getElementById('videoTitle').value;
+    const description = document.getElementById('videoDescription').value;
+
+    if (!file || !title || !description) {
+      alert('Todos os campos são obrigatórios.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('title', title);
+    formData.append('description', description);
+
+    try {
+      const response = await fetch('http://localhost:30000/api/videos', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await response.json();
+      alert(data.message || 'Vídeo adicionado.');
+      carregarVideos();
+    } catch (error) {
+      alert('Erro ao adicionar vídeo.');
+      console.error(error);
+    }
+  }
+
+  window.onload = carregarVideos;
+</script>
+
+
+
+</html>
